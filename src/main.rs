@@ -1,36 +1,59 @@
 use indicatif::HumanDuration;
 use indicatif::ProgressBar;
 use indicatif::ProgressStyle;
-use std::env;
+use std::fs;
 use std::path::PathBuf;
-use std::sync::Arc;
-use std::sync::Mutex;
-use subrut::models::scan::Scan;
+use structopt;
+use structopt::StructOpt;
+
+#[allow(unused)]
+#[derive(Debug, StructOpt)]
+#[structopt(
+    name = "Subrut",
+    about = "This is the tool for brute forcing subdomains."
+)]
+struct Opt {
+    /// Domain to scan
+    #[structopt(short)]
+    domain: String,
+    /// Wordlist file
+    #[structopt(short, parse(from_os_str), default_value = "wordlist_sm.txt")]
+    wordlist: PathBuf,
+    /// Resolver (google, quad9, cloudflare)
+    #[structopt(short, default_value = "google")]
+    resolver: String,
+}
 
 #[tokio::main]
 async fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        eprintln!("Please provide a name to a query");
-        std::process::exit(1);
-    }
-    let path = PathBuf::from("wordlist_sm.txt");
-    let scan = Scan::build_arc_mutex(path, args[1].to_string());
-    let pb = progress_bar(scan.clone());
-    println!("\nStarting ...");
-    subrut::scan(
-        scan.clone(),
-        Some(&|tick| pb.set_position(tick.try_into().unwrap())),
-    );
+    let opt = Opt::from_args();
+    println!("\nWelcome to Subrut!\n");
+    let wordlist_path = opt.wordlist;
+    let domain = opt.domain;
+    let resolver = opt.resolver;
+    // IO Error
+    let wordslist = fs::read_to_string(wordlist_path).unwrap();
+    let pb = progress_bar(&wordslist);
+    println!("Domain: {}", domain);
+    println!("Resolver: {}", resolver);
+    println!("\nSpawning threads ...");
+    let scan = subrut::run(
+        wordslist,
+        domain,
+        resolver,
+        Some(&|scan| pb.set_position(scan.get_ticks_count().try_into().unwrap())),
+    )
+    .unwrap();
     pb.finish_with_message(format!(
         "Brute forcing was done in {}.\nFound {} subdomains.",
         HumanDuration(pb.elapsed()),
-        &scan.lock().unwrap().hosts.len()
+        &scan.hosts.len()
     ));
 }
 
-fn progress_bar(scan: Arc<Mutex<Scan>>) -> ProgressBar {
-    let pb = ProgressBar::new(scan.lock().unwrap().wordlist_len().try_into().unwrap());
+fn progress_bar(wordslist: &String) -> ProgressBar {
+    let len = wordslist.lines().collect::<Vec<&str>>().len();
+    let pb = ProgressBar::new(len.try_into().unwrap());
     pb.set_style(
         ProgressStyle::with_template(
             "\n[{elapsed_precise}] {bar:60.cyan/blue} {pos:>7}/{len:7}\n\n{msg}\n\n",
