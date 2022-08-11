@@ -11,7 +11,7 @@ pub fn run(
     server: String,
     on_tick: Option<&dyn Fn(&MutexGuard<Scan>)>,
 ) -> Result<Scan, ()> {
-    let wordlist_len = &wordslist.lines().collect::<Vec<&str>>().len();
+    let wordslist_len = &wordslist.lines().collect::<Vec<&str>>().len();
     let scan = Scan::new_arc_mutex(domain.clone());
     for word in wordslist.lines() {
         let resolver = Scan::get_resolver_config(&server);
@@ -35,7 +35,7 @@ pub fn run(
             scan.inc_tick(1);
         });
     }
-    while scan.lock().unwrap().is_tick_available(wordlist_len) {
+    while scan.lock().unwrap().is_tick_available(wordslist_len) {
         if let Some(on_tick) = on_tick {
             on_tick(&scan.lock().unwrap());
         }

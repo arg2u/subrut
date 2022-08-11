@@ -16,9 +16,9 @@ struct Opt {
     /// Domain to scan
     #[structopt(short)]
     domain: String,
-    /// Wordlist file
-    #[structopt(short, parse(from_os_str), default_value = "wordlist_sm.txt")]
-    wordlist: PathBuf,
+    /// Wordslist file
+    #[structopt(short, parse(from_os_str), default_value = "wordslist.txt")]
+    wordslist: PathBuf,
     /// Resolver (google, quad9, cloudflare)
     #[structopt(short, default_value = "google")]
     resolver: String,
@@ -28,11 +28,11 @@ struct Opt {
 async fn main() {
     let opt = Opt::from_args();
     println!("\nWelcome to Subrut!\n");
-    let wordlist_path = opt.wordlist;
+    let wordslist_path = opt.wordslist;
     let domain = opt.domain;
     let resolver = opt.resolver;
     // IO Error
-    let wordslist = fs::read_to_string(wordlist_path).unwrap();
+    let wordslist = fs::read_to_string(wordslist_path).unwrap();
     let pb = progress_bar(&wordslist);
     println!("Domain: {}", domain);
     println!("Resolver: {}", resolver);
