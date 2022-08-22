@@ -2,14 +2,25 @@
 name = "subrut"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+description = "The super fast tool for brute forcing subdomains."
+exclude=[".DS_Store"]
+repository = "https://github.com/arg2u/subrut"
+documentation="https://docs.rs/subrut"
+keywords = ["hacking", "dns", "brute force","subdomain"]
 
 [lib]
+name = "subrut"
 subrut = "src/lib.rs"
+doctest = true
+doc = true
+crate-type = ["lib"]
 
 [dependencies]
 trust-dns-resolver = "0.21.2"
 tokio = { version = "1", features = ["full"] }
 indicatif = "0.17.0"
 structopt = "0.3.26"
+serde = {version="1.0.143", features = ["derive"]}
+anscape = "*"
+serde_json = "1.0"
