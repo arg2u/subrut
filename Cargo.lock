@@ -618,7 +618,7 @@ dependencies = [
 
 [[package]]
 name = "subrut"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anscape",
  "indicatif",

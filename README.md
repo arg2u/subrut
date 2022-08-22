@@ -8,6 +8,7 @@ To use Subrut you need to install Cargo and Rust.
 Just paste into your terminal window: 
 ```bash
 curl https://sh.rustup.rs -sSf | sh
+cargo install subrut
 ```
 
 ## **Usage**
