@@ -7,7 +7,7 @@ description = "The super fast tool for brute forcing subdomains."
 exclude=[".DS_Store"]
 repository = "https://github.com/arg2u/subrut"
 documentation="https://docs.rs/subrut"
-keywords = ["hacking", "dns", "brute force","subdomain"]
+keywords = ["hacking", "dns", "bruteforce","subdomain"]
 
 [lib]
 name = "subrut"
